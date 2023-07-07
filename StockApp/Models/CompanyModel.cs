@@ -4,21 +4,17 @@ using System.Numerics;
 namespace StockApp.Models
 {
    /// <summary>
-   /// <c> TickersModel</c> Models IDs for a company in edgar: (CIK ID, ticker, company name)   
+   /// <c> CompanyModel</c> Models IDs for a company in edgar: (CIK ID, ticker, company name)   
    /// </summary>
-    public class TickersModel
+    public class CompanyModel
     {
         
         private string cik;
 
-        /// <summary>
-        /// Ticker is the symbol of the company on its exchange
-        /// </summary>
+        
         private string ticker;
 
-        /// <summary>
-        /// The full name of the corporation
-        /// </summary>
+        
         private string company_name;
 
         /// <summary>
@@ -27,7 +23,7 @@ namespace StockApp.Models
         /// <param name="cik"> This is the CIK ID unique ID given to corps in the edgar database</param>
         /// <param name="ticker"> This is the ticker for a company on a stock exchange</param>
         /// <param name="company_name"> This is the full name of a company</param>
-        public TickersModel(string cik, string ticker, string company_name)
+        public CompanyModel(string cik, string ticker, string company_name)
         {
             if (string.IsNullOrEmpty(cik)) throw new ArgumentNullException(nameof(cik));
             if (string.IsNullOrEmpty(ticker)) throw new ArgumentNullException(nameof(ticker));
@@ -42,7 +38,15 @@ namespace StockApp.Models
         /// CIK index is the unique identifier for a company in the edgar database
         /// </summary>
         public string CIK { get => cik; set => cik = value; }
+
+        /// <summary>
+        /// Ticker is the symbol of the company on its exchange
+        /// </summary>
         public string Ticker { get => ticker; set => ticker = value; }
+
+        /// <summary>
+        /// The full name of the corporation
+        /// </summary>
         public string Company_Name { get => company_name; set => company_name = value; }
     }
 }
