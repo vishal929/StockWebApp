@@ -20,7 +20,9 @@ namespace StockApp.Models
         /// <summary>
         /// A TickersModel is a record representing a unique company in the SEC edgar database
         /// </summary>
-        /// <param name="cik"> This is the CIK ID unique ID given to corps in the edgar database</param>
+        /// <param name="cik"> This is the CIK ID unique ID given to corps in the edgar database
+        /// The cik is a 10 digit identifier, we store this in the program as an unsigned integer for storage savings
+        /// This could fit into a tinyint type in sqlserver</param>
         /// <param name="ticker"> This is the ticker for a company on a stock exchange</param>
         /// <param name="company_name"> This is the full name of a company</param>
         public CompanyModel(uint cik, string ticker, string company_name)
