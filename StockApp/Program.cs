@@ -28,9 +28,8 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 HttpClient test = new HttpClient();
-string jsonResponse = await await LoadCompany.GetAsyncJSONCompanies(test);
-
-LoadCompany.ParseCompaniesJSON(jsonResponse);
+String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
+Console.WriteLine(jsonResponse);
 
 
 app.Run();
