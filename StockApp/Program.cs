@@ -29,7 +29,7 @@ app.MapControllerRoute(
 
 HttpClient test = new HttpClient();
 String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
-Console.WriteLine(jsonResponse);
+FinancialData.parseFinancials(jsonResponse);
 
 
 app.Run();
