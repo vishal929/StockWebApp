@@ -27,9 +27,10 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-HttpClient test = new HttpClient();
-String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
-FinancialData.parseFinancials(jsonResponse);
+//HttpClient test = new HttpClient();
+//String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
+//FinancialData.parseFinancials(jsonResponse);
+await FinancialData.GetFieldNames("Resources/GAAPTemplates/2009/stm/us-gaap-stm-sfp-cls-def-2009-01-31.xml");
 
 
 app.Run();

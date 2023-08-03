@@ -1,9 +1,13 @@
 ﻿using System.Net;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json.Nodes;
+using System.Xml;
 
 namespace StockApp.Utilities
 {
+
+
     /// <summary>
     /// This class handles requesting, parsing, and assigning data requested from the SEC companyfacts xbrl api
     /// </summary>
@@ -43,14 +47,70 @@ namespace StockApp.Utilities
             
         }
         
-        public Dictionary<int,Dictionary<String,String>> getMappingsFromGaapTemplates()
+        /// <summary>
+        /// 
+        /// Given a file representing fieldnames of a financial statement, we return the field names
+        /// </summary>
+        /// <param name="definitionFile"> filepath of a financial statement in the gaap reporting schema</param>
+        /// <returns>We return a list of field names</returns>
+        public static async Task<List<String>> GetFieldNames(string definitionFile)
+        {
+            List<String> fieldNames = new List<String>();
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.Async = true;
+
+            using (XmlReader reader = XmlReader.Create(definitionFile, settings))
+            {
+                while (await reader.ReadAsync())
+                {
+                    if (!reader.LocalName.Equals("definitionArc") || reader.AttributeCount < 4)
+                    {
+                        continue;
+                    };
+                    
+                    if (reader.GetAttribute(1).Equals("http://xbrl.org/int/dim/arcrole/domain-member"))
+                        {
+                            // need to remove the "loc_" part before the field name
+                            fieldNames.Add(reader.GetAttribute(3).Substring(4));
+                            //Console.WriteLine(reader.GetAttribute(3).Substring(4));
+                        }
+                }
+            }
+            return fieldNames;
+        }
+
+        /// <summary>
+        /// 
+        /// Getting GAAP mappings from financial field to statement id based on the year.
+        /// Since gaap fieldnames can be included and deprecated from year to year, we need to 
+        /// specify the year as a parameter
+        /// </summary>
+        /// <param name="year"> This is the year of the gaap schema to choose</param>
+        /// <returns></returns>
+        public static Dictionary<String, Statements> GetGaapMappings(int year)
+        {
+            // based on the year we find the template
+            // we first point to the root of the statements in the reporting schema
+            string stmRoot = Path.Combine("Resources", "GAAPTemplates", year.ToString(), "stm");
+
+            // statement of financial position classified
+            string balanceSheet = Path.Combine(stmRoot, "us-gaap-stm-sfp-cls-def-*.xml");
+            // statement of income
+            string incomeStatement = Path.Combine(stmRoot, "us-gaap-stm-soi-def-*.xml");
+            // statement of cash flow
+            string cashFlowStatement = Path.Combine(stmRoot, "us-gaap-stm-scf-dbo-def-*.xml");
+
+            return null!;
+        }
+        
+        public static Dictionary<int,Dictionary<String,int>> getMappingsFromGaapTemplates()
         {
             // based on which year we are pulling data from, we get a mapping from string to string
             // the key is the year of the template file
             // the value is another dictionary where the key is the reporting field and the
-            // the value is which statement it belongs to (balance sheet, income statement, or cash flow statement)
+            // the value is which statement it belongs to (balance sheet, income statement, or cash flow statement) as an enum
             // this mapping is obtained by parsing the year-specific gaap template in the resources folder
-
+            return null!;
         }
 
         public static void parseFinancials(String dataJSON)

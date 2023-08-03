@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Resources\GAAPTemplates\2009\stm\us-gaap-stm-sfp-cls-def-2009-01-31.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\GAAPTemplates\2011\FASB\dis\us-gaap-dis-acec-2011-01-31.xsd">
       <SubType>Designer</SubType>
     </None>
