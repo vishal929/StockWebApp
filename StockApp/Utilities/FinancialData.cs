@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace StockApp.Utilities
@@ -53,9 +54,10 @@ namespace StockApp.Utilities
         /// </summary>
         /// <param name="definitionFile"> filepath of a financial statement in the gaap reporting schema</param>
         /// <returns>We return a list of field names</returns>
-        public static async Task<List<String>> GetFieldNames(string definitionFile)
+        private static async Task<List<String>> GetFieldNames(string definitionFile)
         {
-            List<String> fieldNames = new List<String>();
+            HashSet<String> fieldNames = new HashSet<String>();
+            //List<String> fieldNames = new List<String>();
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.Async = true;
 
@@ -63,20 +65,47 @@ namespace StockApp.Utilities
             {
                 while (await reader.ReadAsync())
                 {
+                    // we only grab field names from definitionArc nodes and there are only a certain number of attributes
                     if (!reader.LocalName.Equals("definitionArc") || reader.AttributeCount < 4)
                     {
                         continue;
                     };
                     
                     if (reader.GetAttribute(1).Equals("http://xbrl.org/int/dim/arcrole/domain-member"))
-                        {
-                            // need to remove the "loc_" part before the field name
-                            fieldNames.Add(reader.GetAttribute(3).Substring(4));
-                            //Console.WriteLine(reader.GetAttribute(3).Substring(4));
-                        }
+                    {
+                        // need to remove the "loc_" part before the field name and we do not want dupes
+                        // so we add this to a set
+                        string firstField = reader.GetAttribute(3).Substring(4);
+                        string secondField = reader.GetAttribute(2).Substring(4);
+                        fieldNames.Add(firstField);
+                        fieldNames.Add(secondField);
+                        //fieldNames.Add(reader.GetAttribute(3).Substring(4));
+                        //fieldNames.Add(reader.GetAttribute(2).Substring(4));
+                        //Console.WriteLine(reader.GetAttribute(2));
+                        //Console.WriteLine(reader.GetAttribute(3).Substring(4));
+                    }
                 }
             }
-            return fieldNames;
+            return fieldNames.ToList<String>();
+        }
+        
+        /// <summary>
+        /// Helper to just iterate through field names from a statement and then add them to a mappings dictionary
+        /// </summary>
+        /// <param name="mappings"> gaap mappings from fieldname to financial statement</param>
+        /// <param name="fieldnames"> list of fieldnames given</param>
+        /// <param name="statement"> associated statement enumeration </param>
+        private static void InsertMappingsHelper(Dictionary<String,List<Statement>> mappings, List<String> fieldnames, Statement statement)
+        {
+            foreach (string fieldname in fieldnames)
+            {
+                if (!mappings.ContainsKey(fieldname))
+                {
+
+                    mappings[fieldname] = new List<Statement>();
+                }
+                mappings[fieldname].Add(statement);
+            }
         }
 
         /// <summary>
@@ -87,23 +116,74 @@ namespace StockApp.Utilities
         /// </summary>
         /// <param name="year"> This is the year of the gaap schema to choose</param>
         /// <returns></returns>
-        public static Dictionary<String, Statements> GetGaapMappings(int year)
+        public static async Task<Dictionary<String, List<Statement>>> GetGaapMappings(int year)
         {
+            Dictionary<String, List<Statement>> mappings = new Dictionary<String, List<Statement>>();
             // based on the year we find the template
             // we first point to the root of the statements in the reporting schema
             string stmRoot = Path.Combine("Resources", "GAAPTemplates", year.ToString(), "stm");
 
             // statement of financial position classified
-            string balanceSheet = Path.Combine(stmRoot, "us-gaap-stm-sfp-cls-def-*.xml");
+            string balanceSheetPattern = @"^us-gaap-stm-sfp-cls-def-\w*";
             // statement of income
-            string incomeStatement = Path.Combine(stmRoot, "us-gaap-stm-soi-def-*.xml");
+            string incomeStatementPattern = @"^us-gaap-stm-soi-def-\w*";
             // statement of cash flow
-            string cashFlowStatement = Path.Combine(stmRoot, "us-gaap-stm-scf-dbo-def-*.xml");
+            string cashFlowStatementPattern = @"^us-gaap-stm-scf-dbo-def-\w*";
 
-            return null!;
+            Task<List<String>>? balanceSheetAsyncTask = null;
+            Task<List<String>>? incomeStatementAsyncTask = null;
+            Task<List<String>>? cashFlowStatementAsyncTask = null;
+
+            // matching filenames
+            string[] filenames = System.IO.Directory.GetFiles(stmRoot);
+
+            foreach (string file in filenames)
+            {
+                string basepath = Path.GetFileName(file);
+                if (Regex.IsMatch(basepath,balanceSheetPattern))
+                {
+                    balanceSheetAsyncTask = GetFieldNames(file);
+                } else if (Regex.IsMatch(basepath,incomeStatementPattern))
+                {
+                    incomeStatementAsyncTask = GetFieldNames(file);
+                } else if (Regex.IsMatch(basepath,cashFlowStatementPattern))
+                {
+                    cashFlowStatementAsyncTask = GetFieldNames(file);
+                }
+                // if tasks are assigned we can stop
+                if (balanceSheetAsyncTask!=null && incomeStatementAsyncTask!=null && cashFlowStatementAsyncTask!=null)
+                {
+                    break;
+
+                }
+            }
+
+            // null check (if null then something went terribly wrong!)
+            if (balanceSheetAsyncTask==null)
+            {
+                throw new Exception("Field names for balance sheet could not be grabbed. " +
+                "Async task for parsing fields was not assigned! ");
+            }
+            if (cashFlowStatementAsyncTask==null)
+            {
+                throw new Exception("Field names for cash flow statement could not be grabbed. " +
+                "Async task for parsing fields was not assigned! ");
+            }
+            if (incomeStatementAsyncTask==null)
+            {
+                throw new Exception("Field names for income statement could not be grabbed. " +
+                "Async task for parsing fields was not assigned! ");
+            }
+
+            // adding all mappings to a dictionary
+            InsertMappingsHelper(mappings, await balanceSheetAsyncTask, Statement.BalanceSheet);
+            InsertMappingsHelper(mappings, await incomeStatementAsyncTask, Statement.IncomeStatement);
+            InsertMappingsHelper(mappings, await cashFlowStatementAsyncTask, Statement.CashFlowStatement);
+
+            return mappings;
         }
         
-        public static Dictionary<int,Dictionary<String,int>> getMappingsFromGaapTemplates()
+        public static Dictionary<int,Dictionary<String,Statement>> getMappingsFromGaapTemplates()
         {
             // based on which year we are pulling data from, we get a mapping from string to string
             // the key is the year of the template file
