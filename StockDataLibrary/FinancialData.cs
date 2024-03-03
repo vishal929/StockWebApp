@@ -7,7 +7,7 @@ namespace StockApp.Utilities
 
 
     /// <summary>
-    /// This class handles requesting, parsing, and assigning data requested from the SEC companyfacts xbrl api
+    /// This class handles requesting JSON data from SEC
     /// </summary>
     public static class FinancialData
     {
@@ -44,6 +44,22 @@ namespace StockApp.Utilities
             }
             
         }
+
+        /// <summary>
+        /// Requests the json body of company data from SEC Edgar
+        /// This will be parsed into a list of company models
+        /// </summary>
+        /// <param name="httpClient"> This is the url of the request</param>
+        /// <returns> Task that results in a json string</returns>
+        public static async Task<Task<string>> GetAsyncJSONCompanies(HttpClient httpClient)
+        {
+            using HttpResponseMessage response = await httpClient.GetAsync(StockDataLibrary.Constants.SECCompaniesRequest);
+
+            response.EnsureSuccessStatusCode();
+            return response.Content.ReadAsStringAsync();
+        }
+
+
         
         /// <summary>
         /// Given a file representing fieldnames of a financial statement, we return the field names
@@ -53,7 +69,6 @@ namespace StockApp.Utilities
         public static async Task<List<String>> GetFieldNames(string definitionFile)
         {
             HashSet<String> fieldNames = new HashSet<String>();
-            //List<String> fieldNames = new List<String>();
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.Async = true;
 
@@ -75,10 +90,6 @@ namespace StockApp.Utilities
                         string secondField = reader.GetAttribute(2).Substring(4);
                         fieldNames.Add(firstField);
                         fieldNames.Add(secondField);
-                        //fieldNames.Add(reader.GetAttribute(3).Substring(4));
-                        //fieldNames.Add(reader.GetAttribute(2).Substring(4));
-                        //Console.WriteLine(reader.GetAttribute(2));
-                        //Console.WriteLine(reader.GetAttribute(3).Substring(4));
                     }
                 }
             }
@@ -105,7 +116,6 @@ namespace StockApp.Utilities
         }
 
         /// <summary>
-        /// 
         /// Getting GAAP mappings from financial field to statement id based on the year.
         /// Since gaap fieldnames can be included and deprecated from year to year, we need to 
         /// specify the year as a parameter

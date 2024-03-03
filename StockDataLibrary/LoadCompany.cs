@@ -9,20 +9,6 @@ namespace StockApp.Utilities
     /// </summary>
     public static class LoadCompany
     {
-        /// <summary>
-        /// Requests the json body of company data from SEC Edgar
-        /// This will be parsed into a list of company models
-        /// </summary>
-        /// <param name="httpClient"> This is the url of the request</param>
-        /// <returns> Task that results in a json string</returns>
-        public static async Task<Task<string>> GetAsyncJSONCompanies(HttpClient httpClient)
-        {
-            using HttpResponseMessage response = await httpClient.GetAsync("https://www.sec.gov/files/company_tickers_exchange.json");
-
-            response.EnsureSuccessStatusCode();
-            return response.Content.ReadAsStringAsync();
-            //Console.WriteLine($"{jsonResponse}\n");
-        }
        
         /// <summary>
         /// Helper method that handles a json node containing company data
