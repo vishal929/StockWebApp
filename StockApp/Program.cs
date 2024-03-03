@@ -28,15 +28,17 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-//HttpClient test = new HttpClient();
-//String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
+HttpClient test = new HttpClient();
+String jsonResponse = await await FinancialData.requestJSONDump(test,320193);
+Console.WriteLine(jsonResponse);
 //FinancialData.parseFinancials(jsonResponse);
+
+//List<String> names = await FinancialData.GetFieldNames("Resources/GAAPTemplates/2009/stm/us-gaap-stm-sfp-cls-def-2009-01-31.xml");
+//foreach (string name in names) {
+//    Console.WriteLine(name);
+//}
+
 /*
-List<String> names = await FinancialData.GetFieldNames("Resources/GAAPTemplates/2009/stm/us-gaap-stm-sfp-cls-def-2009-01-31.xml");
-foreach (string name in names) {
-    Console.WriteLine(name);
-}
-*/
 Dictionary<string, List<Statement>> mappings = await FinancialData.GetGaapMappings(2009);
 foreach (KeyValuePair<string, List<Statement>> pair in mappings)
 {
@@ -54,5 +56,6 @@ foreach (KeyValuePair<string, List<Statement>> pair in mappings)
     Console.WriteLine("***************");
     Console.WriteLine("***************");
 }
+*/
 
 app.Run();

@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -25,7 +22,7 @@ namespace StockApp.Utilities
         {
             // need to pad the CIK to 10 digits (adding leading zeros)
             String cikstr = String.Format("{0:D10}", CIK);
-            String requestURL = "https://data.sec.gov/api/xbrl/companyfacts/CIK" + cikstr+".json";
+            String requestURL = String.Format(StockDataLibrary.Constants.SECFilingRequestTemplate, cikstr);
             // forming the request
             
             try
@@ -49,12 +46,11 @@ namespace StockApp.Utilities
         }
         
         /// <summary>
-        /// 
         /// Given a file representing fieldnames of a financial statement, we return the field names
         /// </summary>
         /// <param name="definitionFile"> filepath of a financial statement in the gaap reporting schema</param>
         /// <returns>We return a list of field names</returns>
-        private static async Task<List<String>> GetFieldNames(string definitionFile)
+        public static async Task<List<String>> GetFieldNames(string definitionFile)
         {
             HashSet<String> fieldNames = new HashSet<String>();
             //List<String> fieldNames = new List<String>();

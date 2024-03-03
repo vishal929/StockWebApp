@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Connections.Features;
-using StockApp.Models;
-using System.Collections;
+﻿using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -46,6 +44,7 @@ namespace StockApp.Utilities
                 companyNode[3]!.ToString()); // exchange
         }
         
+        /*
         /// <summary>
         /// Function that takes in a json string of company metadata and returns a list of company model objects.
         /// </summary>
@@ -97,6 +96,7 @@ namespace StockApp.Utilities
             return companies;
 
         }
+        */
 
 
     }

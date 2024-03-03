@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.6.33815.320
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockApp", "StockApp\StockApp.csproj", "{89810360-06FF-45CC-ACB6-B31A224B654D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockApp", "StockApp\StockApp.csproj", "{89810360-06FF-45CC-ACB6-B31A224B654D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockDataLibrary", "StockDataLibrary\StockDataLibrary.csproj", "{ADB4C0AA-470F-46A7-A45A-CFEBB3FDF5FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{89810360-06FF-45CC-ACB6-B31A224B654D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89810360-06FF-45CC-ACB6-B31A224B654D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89810360-06FF-45CC-ACB6-B31A224B654D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADB4C0AA-470F-46A7-A45A-CFEBB3FDF5FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADB4C0AA-470F-46A7-A45A-CFEBB3FDF5FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADB4C0AA-470F-46A7-A45A-CFEBB3FDF5FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADB4C0AA-470F-46A7-A45A-CFEBB3FDF5FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

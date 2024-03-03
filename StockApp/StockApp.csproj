@@ -12,4 +12,12 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Utilities\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StockDataLibrary\StockDataLibrary.csproj" />
+  </ItemGroup>
+
 </Project>
